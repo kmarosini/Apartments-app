@@ -13,8 +13,8 @@ namespace DataLayer.Dal
 {
     public class DBRepo : IRepo
     {
-        private static string CS = @"Data Source=DESKTOP-958MSQ8\MSSQLSERVER01;Initial Catalog=RwaApartmani;Integrated Security=True";
-        private static string APARTMENTS_CS = @"Data Source=DESKTOP-958MSQ8\MSSQLSERVER01;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string APARTMENTS_CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
         
 
         public IList<ApartmentTags> LoadApartmentTags()

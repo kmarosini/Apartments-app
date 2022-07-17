@@ -19,7 +19,7 @@ namespace ApartmentsApp
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-958MSQ8\MSSQLSERVER01;Initial Catalog=RwaApartmani;Integrated Security=True");
+            SqlConnection conn = new SqlConnection(@"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True");
             conn.Open();
 
             string checkUser = "select * from LoginDB where username='" + txtUsername.Text + "'";

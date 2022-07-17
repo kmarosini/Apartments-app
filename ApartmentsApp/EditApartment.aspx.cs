@@ -1,6 +1,5 @@
 ﻿using DataLayer.Dal;
 using DataLayer.Model;
-using Microsoft.ApplicationBlocks.Data;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;

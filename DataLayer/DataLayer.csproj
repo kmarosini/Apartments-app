@@ -63,6 +63,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Images\" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
     <None Include="Scripts\jquery-3.6.0.min.map" />
     <None Include="Scripts\jquery-3.6.0.slim.min.map" />
@@ -85,9 +88,6 @@
     <Content Include="sorter\desc.gif" />
     <Content Include="sorter\style.css" />
     <Content Include="tablesorter.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Images\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
