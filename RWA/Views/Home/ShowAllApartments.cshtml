@@ -1,0 +1,87 @@
+﻿@model RWA.Models.ApartmentVM
+
+@{
+    ViewBag.Title = "ShowAllApartments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var cities = ViewBag.Cities;
+}
+
+@using (Html.BeginForm("FilterApartments", "Home", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Filter</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Filter.Grad, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Cities",new SelectList(cities), "Select city", new {@class = "form-control"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Filter.RoomNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Filter.RoomNumber, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.RoomNumber, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Filter.Adults, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Filter.Adults, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.Adults, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Filter.Children, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Filter.Children, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filter.Children, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<h2>Apartment Overview</h2>
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model.ListaApartmana)
+        {
+
+            <div class="col-md-3">
+                <img src="data:image/png;base64" width="100" height="100" />
+                <h1>@item.Name</h1>
+
+                <ul>
+                    <li>@item.BeachDistance m</li>
+                    <li>@item.TotalRooms rooms</li>
+                    <li>@item.MaxAdults adults</li>
+                    <li>@item.MaxChildren children</li>
+                </ul>
+
+                <h3>@item.Price €</h3>
+
+                <a href=@($"/Home/ApartmentDetails/{item.Id}")>Reservation</a>
+            </div>
+
+        }
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+
+

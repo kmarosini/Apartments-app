@@ -1,0 +1,60 @@
+﻿@model ApartmentsMVCApp.Models.ApartmentViewModel
+
+@{
+    ViewBag.Title = "ShowAllApartments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var cities = ViewBag.Cities;
+}
+
+<form>
+    <label for="rooms">Rooms:</label><br>
+    <input type="text" id="rooms" name="rooms"><br>
+    <label for="adults">Adults:</label><br>
+    <input type="text" id="adults" name="adults"><br>
+    <label for="children">Children:</label><br>
+    <input type="text" id="children" name="children"><br>
+    <label for="destination">Destination: </label>
+
+    @Html.DropDownList("ddlCity", new SelectList(cities), "Select city")
+    <br />
+
+    <select>
+        <option value="Default">Default</option>
+        <option value="Uzlazno">Uzlazno</option>
+        <option value="Silazno">Silazno</option>
+    </select>
+
+    <button id="Sort" type="submit">Go!</button>
+</form>
+
+
+<h2>Apartment Overview</h2>
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model.ListaApartmana)
+                {
+
+        <div class="col-md-3">
+            <img resource="C:\Users\Korsnik\Pictures\4k-james-harden-2019-basketball-stars-nba-besthqwallpapers.com-1920x1080.jpg" width="100" height="100" />
+            <h1>@item.Name</h1>
+
+            <ul>
+                <li>@item.BeachDistance m</li>
+                <li>@item.TotalRooms rooms</li>
+                <li>@item.MaxAdults adults</li>
+                <li>@item.MaxChildren children</li>
+            </ul>
+
+            <h3>@item.Price €</h3>
+
+            <a href=@($"/Home/ApartmentDetails/{item.Id}")>Reservation</a>
+        </div>
+
+                }
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+
+

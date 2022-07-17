@@ -1,0 +1,34 @@
+﻿@model RWA.Models.ReviewReservationViewModel
+
+<form id="ApartmentReviewForm">
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>ApartmentReview</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Review.Details, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Review.Details, new { htmlAttributes = new { @class = "form-control", @id = "details-field" } })
+                @Html.ValidationMessageFor(model => model.Review.Details, "", new { @class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Review.Stars, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Review.Stars, new { htmlAttributes = new { @class = "form-control", @id = "stars-field" } })
+                @Html.ValidationMessageFor(model => model.Review.Stars, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
+

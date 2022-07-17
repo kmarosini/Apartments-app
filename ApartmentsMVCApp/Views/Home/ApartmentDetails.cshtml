@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "ApartmentDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var apartment = ViewBag.Apartment;
+    var tags = ViewBag.Tags;
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <h1>@apartment.Name</h1>
+            <img resource="C:\Users\Korsnik\Pictures\4k-james-harden-2019-basketball-stars-nba-besthqwallpapers.com-1920x1080.jpg" width="100" height="100" />
+            <ul>
+                <li>@apartment.BeachDistance m</li>
+                <li>@apartment.TotalRooms rooms</li>
+                <li>@apartment.MaxAdults adults</li>
+                <li>@apartment.MaxChildren children</li>
+            </ul>
+
+            <h3>@apartment.Price €</h3>
+            <ul>
+                @foreach (var item in tags)
+                {
+                    <li>@item.Name</li>
+                }
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h1>Contact</h1>
+
+            <form>
+                <label for="name">Name:</label><br>
+                <input type="text" id="name" name="name"><br>
+                <label for="email">Email:</label><br>
+                <input type="text" id="email" name="email"><br>
+                <label for="phone">Phone:</label><br>
+                <input type="text" id="phone" name="phone"><br>
+                <label for="adults">Adults:</label><br>
+                <input type="text" id="adults" name="adults"><br>
+                <label for="children">Children:</label><br>
+                <input type="text" id="children" name="children"><br>
+                <button type="submit">Reservation</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+

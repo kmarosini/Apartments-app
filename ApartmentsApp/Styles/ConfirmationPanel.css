@@ -1,0 +1,16 @@
+﻿body {
+}
+
+.AlertModal{
+    padding:20px;
+    width:20%;
+    background-color:whitesmoke;
+}
+
+.YesButton{
+    width:50px;
+}
+
+.NoButton {
+    width: 50px;
+}
