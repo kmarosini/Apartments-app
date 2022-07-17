@@ -53,10 +53,7 @@ namespace DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public User AuthUser(string username, string password)
-        {
-            throw new NotImplementedException();
-        }
+     
 
         public IList<City> LoadCities()
         {
@@ -330,5 +327,37 @@ namespace DataLayer.Dal
         {
             SqlHelper.ExecuteNonQuery(APARTMENTS_CS, nameof(SaveReservationForUnregisteredUsers), reservation.ApartmentId, reservation.Details, reservation.UserName, reservation.UserEmail, reservation.UserPhone, reservation.UserAdress);
         }
+
+        public void RegisterUser(AspNetUsers user)
+        {
+            SqlHelper.ExecuteNonQuery(APARTMENTS_CS, nameof(RegisterUser), user.Email, user.PasswordHash, user.PhoneNumber, user.UserName, user.Address);
+        }
+
+        public AspNetUsers AuthUser(string email, string password)
+        {
+            var tblUsers = SqlHelper.ExecuteDataset(APARTMENTS_CS, "AuthUser", email, password).Tables[0];
+            List<AspNetUsers> users = new List<AspNetUsers>();
+
+            foreach (DataRow row in tblUsers.Rows)
+            {
+                users.Add(
+                    new AspNetUsers
+                    {
+                        UserName = (string)row[nameof(AspNetUsers.UserName)],
+                        PhoneNumber = (string)row[nameof(AspNetUsers.PhoneNumber)],
+                        Address = (string)row[nameof(AspNetUsers.Address)],
+                        Email = (string)row[nameof(AspNetUsers.Email)]
+                    }
+                );
+
+            }
+
+            if (users.Count == 0)
+            {
+                return null;
+            }
+            return users[0];
+        }
+
     }
 }

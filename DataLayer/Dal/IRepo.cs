@@ -9,7 +9,6 @@ namespace DataLayer.Dal
 {
     public interface IRepo
     {
-        User AuthUser(string username, string password);
         IList<City> LoadCities();
         IList<User> LoadUsers();
         IList<ApartmentStatus> LoadApartmentStatus();
@@ -37,6 +36,8 @@ namespace DataLayer.Dal
         void SaveApartmentReview(ApartmentReview review);
         void SaveReservationForUnregisteredUsers(ApartmentReservation reservation);
 
+        void RegisterUser(AspNetUsers user);
 
+        AspNetUsers AuthUser(string email, string password);
     }
 }

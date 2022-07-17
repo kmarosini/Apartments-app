@@ -287,7 +287,7 @@ insert into ApartmentReservation(Guid, CreatedAt, ApartmentId, Details, UserName
 values ( NEWID(), GETDATE(), @ApartmentId, @Details, @UserName,@UserEmail, @UserPhone, @UserAddress);
 end
 
-alter proc SaveReservationForRegisteredUsers
+create proc SaveReservationForRegisteredUsers
 	@ApartmentId int,
 	@Details nvarchar(1000),
 	@UserId int
@@ -297,6 +297,29 @@ insert into ApartmentReservation(Guid, CreatedAt, ApartmentId, Details, UserId)
 values ( NEWID(), GETDATE(), @ApartmentId, @Details, @UserId)
 end
 
+CREATE PROC AuthUser
+	@Email NVARCHAR(50),
+	@password NVARCHAR(128)
+AS
+BEGIN
+	SELECT * 
+	FROM AspNetUsers
+	WHERE Email=@Email AND PasswordHash=@password 
+END
+GO
+
+alter PROC RegisterUser
+	@Email NVARCHAR(50),
+	@PasswordHash nvarchar(MAX),
+	@PhoneNumber NVARCHAR(MAX),
+	@UserName NVARCHAR(50),
+	@Address NVARCHAR(128)
+AS
+BEGIN
+	INSERT INTO AspNetUsers
+	VALUES (NEWID(), GETDATE(), NULL, @Email, 1, @PasswordHash, NULL, @PhoneNumber, 1, NULL, 0, 0, @UserName, @Address )
+END
+GO
 
 exec GetApartmentPictures 3
 
