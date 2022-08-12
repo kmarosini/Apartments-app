@@ -13,8 +13,8 @@ namespace DataLayer.Dal
 {
     public class DBRepo : IRepo
     {
-        private static string CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
-        private static string APARTMENTS_CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string APARTMENTS_CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
         
 
         public IList<ApartmentTags> LoadApartmentTags()
@@ -335,7 +335,7 @@ namespace DataLayer.Dal
 
         public AspNetUsers AuthUser(string email, string password)
         {
-            var tblUsers = SqlHelper.ExecuteDataset(APARTMENTS_CS, "AuthUser", email, password).Tables[0];
+            var tblUsers = SqlHelper.ExecuteDataset(APARTMENTS_CS, "AuthUser", email, Cryptography.HashPassword(password)).Tables[0];
             List<AspNetUsers> users = new List<AspNetUsers>();
 
             foreach (DataRow row in tblUsers.Rows)

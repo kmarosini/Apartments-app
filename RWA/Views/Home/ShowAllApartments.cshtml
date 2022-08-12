@@ -16,16 +16,21 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            @Html.LabelFor(model => model.Filter.Grad, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Filter.GradId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("Cities",new SelectList(cities), "Select city", new {@class = "form-control"})
+                    <select id="gradField">
+                        @foreach (var item in cities)
+                        {
+                            <option value="@item.Id">@item</option>
+                        }
+                    </select>
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.RoomNumber, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Filter.RoomNumber, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Filter.RoomNumber, new { htmlAttributes = new { @class = "form-control", @Id = "roomNumberField" } })
                 @Html.ValidationMessageFor(model => model.Filter.RoomNumber, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -33,7 +38,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.Adults, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Filter.Adults, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Filter.Adults, new { htmlAttributes = new { @class = "form-control", @Id = "adultsField" } })
                 @Html.ValidationMessageFor(model => model.Filter.Adults, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -41,7 +46,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.Children, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Filter.Children, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Filter.Children, new { htmlAttributes = new { @class = "form-control", @Id = "childrenField" } } )
                 @Html.ValidationMessageFor(model => model.Filter.Children, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -84,4 +89,31 @@
 
 @Scripts.Render("~/bundles/jquery")
 
+@section Scripts{
+    <script>
+        const gradField = $('#gradField').val();
+        const gradId = parseInt(gradField);
+        console.log(gradField)
+        const roomNumberField = document.querySelector("#roomNumberField");
+        const adultsField = document.querySelector("#adultsField");
+        const childrenField = document.querySelector("#childrenField");
 
+        forma.onsubmit = function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "/Home/FilterApartments",
+                data: {
+                    GradId: parseInt(gradField),
+                    RoomNumber: roomNumberField.value,
+                    Adults: adultsField.value,
+                    Children: childrenField.value
+                },
+                error: function (err) {
+                    alert("Error")
+                }
+            })
+        }
+    </script>
+
+}

@@ -10,7 +10,7 @@ namespace RWA.Models
     public class Filter
     {
         
-        public List<SelectListItem> Grad { get; set; }
+        public int GradId { get; set; }
         public int RoomNumber { get; set; }
         public int Adults { get; set; }
         public int Children { get; set; }

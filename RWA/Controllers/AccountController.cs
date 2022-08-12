@@ -44,13 +44,16 @@ namespace RWA.Controllers
 
             AspNetUsers user = RepoFactory.GetRepo().AuthUser(model.Email, model.Password);
 
+
             if (user == null)
             {
                 ViewBag.ErrorMessage = "Wrong email or password!";
                 return View(model);
             }
 
-            return View(model);
+            Session["user"] = user;
+
+            return RedirectToAction("ShowAllApartments", "Home");
         }
 
         //
@@ -76,6 +79,7 @@ namespace RWA.Controllers
                 return View(model);
             }
 
+
             RepoFactory.GetRepo().RegisterUser(new DataLayer.Model.AspNetUsers {
                 Email = model.Email,
                 PasswordHash = Cryptography.HashPassword(model.Password),
@@ -85,6 +89,13 @@ namespace RWA.Controllers
             });
 
             return View("Login");
+        }
+
+        public ActionResult Odjava()
+        {
+            Session["user"] = null;
+
+            return RedirectToAction("ShowAllApartments", "Home");
         }
     }
 }

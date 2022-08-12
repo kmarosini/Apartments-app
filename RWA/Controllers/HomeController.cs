@@ -97,14 +97,18 @@ namespace ApartmentsMVCApp.Controllers
             IList<DataLayer.Model.Apartment> _listOfAllApartments = RepoFactory.GetRepo().LoadApartments();
             var cities = RepoFactory.GetRepo().LoadCities();
             ViewBag.Cities = cities;
-
+             
             if (!ModelState.IsValid)
             {
                 return View("ShowAllApartments", new ApartmentVM { ListaApartmana = (List<Apartment>)_listOfAllApartments });
             }
 
+            var PmtFreq = Request.Form["gradField"];
 
-            return View("ShowAllApartments", new ApartmentVM { ListaApartmana = (List<Apartment>)_listOfAllApartments });
+
+            List<Apartment> list = _listOfAllApartments.ToList().FindAll(a => a.CityId == filter.GradId);
+
+            return View("ShowAllApartments", new ApartmentVM { ListaApartmana = list });
         }
     }
 }

@@ -1,5 +1,7 @@
 use RwaApartmani
 
+
+
 Create proc get_tags
 as
 begin
@@ -50,7 +52,7 @@ delete from Tag
 where Tag.Id=@Id
 end
 
-alter proc CreateApartment
+create proc CreateApartment
 	@OwnerId int,
 	@TypeId int,
 	@StatusId int,
@@ -70,7 +72,7 @@ begin
 	values (NEWID(), GETDATE(), NULL, @OwnerId, @TypeId, @StatusId, @CityId, @Adress, @Name, @NameEng, @Price, @MaxAdults, @MaxChildren, @TotalRooms, @BeachDistance)
 end
 
-alter proc getApartments
+create proc getApartments
 as
 begin
 select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content
@@ -94,7 +96,7 @@ begin
 select * from ApartmentStatus
 end
 
-alter proc updateApartment
+create proc updateApartment
 	@Id int,
 	@StatusId int,
 	@MaxAdults int,
@@ -164,7 +166,7 @@ end
 exec SoftDelete 14
 exec getApartmentById 1
 
-alter proc GetUsedTags
+create proc GetUsedTags
 	@Id int
 as
 begin
@@ -175,7 +177,7 @@ where ApartmentId = @Id
 end
 
 
-alter proc GetUnusedTags
+create proc GetUnusedTags
 	@Id int
 as
 begin
@@ -211,7 +213,7 @@ begin
 	values(NEWID(), GETDATE(), NULL, @Email, 1, NULL, NULL, @PhoneNumber, 1, NULL, 0, 0, @UserName, @Address)
 end
 
-alter proc InsertNotRegisteredResevation
+create proc InsertNotRegisteredResevation
 	@ApartmentId int,
 	@Details nvarchar(1000),
 	@UserId nvarchar(256),
@@ -226,7 +228,7 @@ begin
 	values(NEWID(), GETDATE(), @ApartmentId, @Details, @UserId, @UserName, @UserEmail, @UserPhone, @UserAdress)
 end
 
-alter proc SavePicture
+create proc SavePicture
 	@ApartmentId int,
 	@Name nvarchar(250),
 	@Base64Content varbinary(max) 
@@ -241,7 +243,7 @@ insert into ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Bas
 values (NEWID(), GETDATE(), NULL, @ApartmentId, null, @Base64Content, @Name, 1);
 end
 
-alter proc GetApartmentPictures 
+create proc GetApartmentPictures 
   @ApartmentId int
 as 
 begin
@@ -251,7 +253,7 @@ where ApartmentId = @ApartmentId
 end
 
 
-alter proc SetAsRepresentative
+create proc SetAsRepresentative
 	@ApartmentId int,
 	@Id int
 as
@@ -308,7 +310,7 @@ BEGIN
 END
 GO
 
-alter PROC RegisterUser
+create PROC RegisterUser
 	@Email NVARCHAR(50),
 	@PasswordHash nvarchar(MAX),
 	@PhoneNumber NVARCHAR(MAX),
