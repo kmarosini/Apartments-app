@@ -52,7 +52,7 @@ delete from Tag
 where Tag.Id=@Id
 end
 
-create proc CreateApartment
+alter proc CreateApartment
 	@OwnerId int,
 	@TypeId int,
 	@StatusId int,
@@ -64,28 +64,34 @@ create proc CreateApartment
 	@MaxAdults int,
 	@MaxChildren int,
 	@TotalRooms int,
-	@BeachDistance int
+	@BeachDistance int,
+	@CreatedApartment int output
 as
 begin
 	insert into Apartment
 				(Guid, CreatedAt, DeletedAt, OwnerId, TypeId, StatusId, CityId,Address,Name,NameEng,Price,MaxAdults,MaxChildren,TotalRooms,BeachDistance)
 	values (NEWID(), GETDATE(), NULL, @OwnerId, @TypeId, @StatusId, @CityId, @Adress, @Name, @NameEng, @Price, @MaxAdults, @MaxChildren, @TotalRooms, @BeachDistance)
+	SET @CreatedApartment = SCOPE_IDENTITY()
 end
 
-create proc getApartments
+alter proc getApartments
 as
 begin
 select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content
 from Apartment
 LEFT JOIN City on City.Id = Apartment.CityId
 left join ApartmentStatus on ApartmentStatus.Id = Apartment.StatusId
-left join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
+inner join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
 where Apartment.DeletedAt is NULL AND ApartmentPicture.IsRepresentative = 1
 group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative
 end
 
 create proc getAllApartmentOwner
-as
+
+
+
+
+
 begin
 select * from ApartmentOwner
 end
@@ -141,17 +147,17 @@ left join AspNetUsers on AspNetUsers.Id = ApartmentReservation.Id
 group by Apartment.Name, ApartmentReservation.Id, ApartmentReservation.ApartmentId, ApartmentReservation.UserId, AspNetUsers.UserName
 end
 
-create proc getApartmentById
+alter proc getApartmentById
 	@Id int
 as 
 begin
-select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName,Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance
+select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content
 from Apartment
 LEFT JOIN City on City.Id = Apartment.CityId
 left join ApartmentStatus on ApartmentStatus.Id = Apartment.StatusId
 left join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
-where Apartment.Id = @Id
-group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance
+where Apartment.DeletedAt is NULL AND ApartmentPicture.IsRepresentative = 1 AND Apartment.Id = @Id
+group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative
 end
 
 create proc SoftDelete
@@ -253,15 +259,15 @@ where ApartmentId = @ApartmentId
 end
 
 
-create proc SetAsRepresentative
+alter proc SetAsRepresentative
 	@ApartmentId int,
-	@Id int
+	@Id int --pictureId
 as
 begin
-update ApartmentPicture set IsRepresentative = 1
-where ApartmentId=@ApartmentId
 update ApartmentPicture set IsRepresentative = 0
-where Id!=@Id
+where ApartmentId=@ApartmentId
+update ApartmentPicture set IsRepresentative = 1
+where ApartmentPicture.Id=@Id
 end
 
 
@@ -272,9 +278,12 @@ create proc SaveApartmentReview
 	@Stars int
 as
 begin
-insert into ApartmentReview(Guid, CreatedAt, ApartmentId, UserId, Details, Stars)
-values ( NEWID(), GETDATE(), @ApartmentId, @UserId, @Details, @Stars);
+	insert into ApartmentReview(Guid, CreatedAt, ApartmentId, UserId, Details, Stars)
+	values ( NEWID(), GETDATE(), @ApartmentId, @UserId, @Details, @Stars);
 end
+
+insert into ApartmentReview(Guid, CreatedAt, ApartmentId, UserId, Details, Stars)
+values ( NEWID(), GETDATE(), 1, 1, 'test', 2);
 
 create proc SaveReservationForUnregisteredUsers
 	@ApartmentId int,
@@ -323,13 +332,20 @@ BEGIN
 END
 GO
 
+insert into ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Base64Content, Name, IsRepresentative)
+values (NEWID(), GETDATE(), NULL, 1, null, CONVERT(VARBINARY(MAX),'mmsm'), 'dcsdd', 1);
+
 exec GetApartmentPictures 3
 
-delete from ApartmentPicture
+alter table ApartmentPicture
+drop column Base64content
 
 alter table ApartmentPicture
 add Base64Content VARBINARY(MAX)
 
+
+insert into LoginDB(UserID ,username, pass)
+values (1,'admin', '123')
 
 
 select * from Tag

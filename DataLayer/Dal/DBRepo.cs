@@ -15,7 +15,11 @@ namespace DataLayer.Dal
     {
         private static string CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
         private static string APARTMENTS_CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
-        
+
+        private SqlConnection connection;
+        private SqlCommand command;
+
+
 
         public IList<ApartmentTags> LoadApartmentTags()
         {
@@ -104,6 +108,7 @@ namespace DataLayer.Dal
                        CityId = (int)row[nameof(Apartment.CityId)],
                        StatusId = (int)row[nameof (Apartment.StatusId)], 
                        StatusName = (string)row[nameof(Apartment.StatusName)],
+                       Base64Content = (byte[])row[nameof(Apartment.Base64Content)],
                        Ukupno = (int)row[nameof(Apartment.Ukupno)]
                    }
                );
@@ -117,9 +122,33 @@ namespace DataLayer.Dal
             SqlHelper.ExecuteNonQuery(APARTMENTS_CS, nameof(CreateTag), tag.Guid, tag.CreatedAt, tag.TypeId, tag.Name, tag.NameEng);
         }
 
-        public void CreateApartment(Apartment apartment)
+        public int CreateApartment(Apartment apartment)
         {
-            SqlHelper.ExecuteNonQuery(APARTMENTS_CS, nameof(CreateApartment), apartment.OwnerId, apartment.TypeId, apartment.StatusId, apartment.CityId, apartment.Adress, apartment.Name, apartment.NameEng, apartment.Price, apartment.MaxAdults, apartment.MaxChildren, apartment.TotalRooms, apartment.BeachDistance);
+            //SqlHelper.ExecuteNonQuery(APARTMENTS_CS, nameof(CreateApartment), apartment.OwnerId, apartment.TypeId, apartment.StatusId, apartment.CityId, apartment.Adress, apartment.Name, apartment.NameEng, apartment.Price, apartment.MaxAdults, apartment.MaxChildren, apartment.TotalRooms, apartment.BeachDistance);
+
+            using (connection = new SqlConnection(@"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True"))
+            {
+                connection.Open();
+                command = new SqlCommand("CreateApartment", connection);
+                command.Parameters.AddWithValue("OwnerId", apartment.OwnerId);
+                command.Parameters.AddWithValue("TypeId", apartment.TypeId);
+                command.Parameters.AddWithValue("StatusId", apartment.StatusId);
+                command.Parameters.AddWithValue("CityId", apartment.CityId);
+                command.Parameters.AddWithValue("Adress", apartment.Adress);
+                command.Parameters.AddWithValue("Name", apartment.Name);
+                command.Parameters.AddWithValue("NameEng", apartment.NameEng);
+                command.Parameters.AddWithValue("Price", apartment.Price);
+                command.Parameters.AddWithValue("MaxAdults", apartment.MaxAdults);
+                command.Parameters.AddWithValue("MaxChildren", apartment.MaxChildren);
+                command.Parameters.AddWithValue("TotalRooms", apartment.TotalRooms);
+                command.Parameters.AddWithValue("BeachDistance", apartment.BeachDistance);
+                command.Parameters.Add("CreatedApartment", System.Data.SqlDbType.Int);
+                command.Parameters["CreatedApartment"].Direction = System.Data.ParameterDirection.Output;
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.ExecuteNonQuery();
+
+                return Convert.ToInt32(command.Parameters["CreatedApartment"].Value);
+            }
         }
 
         public IList<ApartmentOwner> LoadApartmentOwner()
@@ -235,6 +264,7 @@ namespace DataLayer.Dal
                     CityId = (int)row[nameof(Apartment.CityId)],
                     StatusId = (int)row[nameof(Apartment.StatusId)],
                     StatusName = (string)row[nameof(Apartment.StatusName)],
+                    Base64Content = (byte[])row[nameof(Apartment.Base64Content)],
                     Ukupno = (int)row[nameof(Apartment.Ukupno)]
                 };
             }
@@ -346,7 +376,8 @@ namespace DataLayer.Dal
                         UserName = (string)row[nameof(AspNetUsers.UserName)],
                         PhoneNumber = (string)row[nameof(AspNetUsers.PhoneNumber)],
                         Address = (string)row[nameof(AspNetUsers.Address)],
-                        Email = (string)row[nameof(AspNetUsers.Email)]
+                        Email = (string)row[nameof(AspNetUsers.Email)],
+                        Id = (int)row[nameof(AspNetUsers.Id)]
                     }
                 );
 

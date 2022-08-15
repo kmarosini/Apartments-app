@@ -13,7 +13,5 @@ namespace RWA.Models
 
         [Required(ErrorMessage = "Niste unjeli zvjezde!")]
         public int Stars { get; set; }
-
-        public override string ToString() => $"{Details}";
     }
 }

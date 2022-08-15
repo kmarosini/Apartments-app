@@ -16,12 +16,38 @@ namespace ApartmentsMVCApp.Controllers
         {
             IList<DataLayer.Model.Apartment> _listOfAllApartments = RepoFactory.GetRepo().LoadApartments();
             var cities = RepoFactory.GetRepo().LoadCities();
-            ViewBag.Cities = cities;
 
-            return View(new ApartmentVM
+            
+
+            string[] vs = HttpContext.Request.Cookies["sortingFilterOptions"]?.Value.ToString().Split('|');
+
+
+            if (vs == null)
             {
-                ListaApartmana = _listOfAllApartments.ToList()
-            });
+                ViewBag.Cities = cities;
+                return View(new ApartmentVM
+                {
+                    ListaApartmana = _listOfAllApartments.ToList(),
+                    Filter = null
+                });
+            }
+            else
+            {
+                RWA.Models.Filter filter = new RWA.Models.Filter
+                {
+                    GradId = int.Parse(vs[0]),
+                    RoomNumber = int.Parse(vs[1]),
+                    Adults = int.Parse(vs[2]),
+                    Children = int.Parse(vs[3])
+                };
+                ViewBag.Cities = cities;
+
+                return View(new ApartmentVM
+                {
+                    ListaApartmana = _listOfAllApartments.ToList(),
+                    Filter = filter
+                });
+            }
         }
 
 
@@ -30,9 +56,13 @@ namespace ApartmentsMVCApp.Controllers
         {
             var apartment = RepoFactory.GetRepo().getApartmentById(id);
             var tags = RepoFactory.GetRepo().GetUsedTags(id);
+            var pictures = RepoFactory.GetRepo().GetApartmentPictures(id);
+
+            Session["currentApartment"] = id;
 
             ViewBag.Apartment = apartment;
             ViewBag.Tags = tags;
+            ViewBag.Pictures = pictures;
 
             return View("ApartmentDetails");
         }
@@ -57,8 +87,9 @@ namespace ApartmentsMVCApp.Controllers
                 Details = reservation.Details,
                 ApartmentId = int.Parse(Url.RequestContext.RouteData.Values["id"].ToString())
             });
-
-            return View("ShowAllApartments");
+            var cities = RepoFactory.GetRepo().LoadCities();
+            ViewBag.Cities = cities;
+            return View("ShowAllApartments", new ApartmentVM { Filter = null, ListaApartmana = (List<Apartment>)RepoFactory.GetRepo().LoadApartments()});
         }
 
         private void GetApartmentDetails()
@@ -73,7 +104,7 @@ namespace ApartmentsMVCApp.Controllers
         [HttpPost]
         public ActionResult CreateApartmentReview(RWA.Models.ApartmentReview a)
         {
-                //var apartment = RepoFactory.GetRepo().getApartmentById(int.Parse(Url.RequestContext.RouteData.Values["id"].ToString()));
+             //var apartment = RepoFactory.GetRepo().getApartmentById(int.Parse(Url.RequestContext.RouteData.Values["id"].ToString()));
 
             if (!ModelState.IsValid)
             {
@@ -81,12 +112,19 @@ namespace ApartmentsMVCApp.Controllers
                 return RedirectToAction("ApartmentDetails", new ReviewReservationViewModel { Reservation = new RWA.Models.ApartmentReservation(), Review = a });
             }
 
+            int id = (int)Session["currentApartment"];
+
+            int stars = a.Stars;
+            string details = a.Details;
+
+
             RepoFactory.GetRepo().SaveApartmentReview(new DataLayer.Model.ApartmentReview
             {
-                ApartmentId = 2,
-                Details = a.Details,
-                UserId = 1,
-                Stars = a.Stars
+
+                ApartmentId = int.Parse(id.ToString()),
+                Details = details,
+                UserId = ((AspNetUsers)Session["user"]).Id,
+                Stars = stars
             });
 
             return RedirectToAction("ShowAllApartments");
@@ -96,6 +134,9 @@ namespace ApartmentsMVCApp.Controllers
         {
             IList<DataLayer.Model.Apartment> _listOfAllApartments = RepoFactory.GetRepo().LoadApartments();
             var cities = RepoFactory.GetRepo().LoadCities();
+
+            HttpContext.Response.Cookies.Add(new HttpCookie("sortingFilterOptions", $"{filter.GradId}|{filter.RoomNumber}|{filter.Adults}|{filter.Children}"));
+
             ViewBag.Cities = cities;
              
             if (!ModelState.IsValid)
@@ -106,9 +147,45 @@ namespace ApartmentsMVCApp.Controllers
             var PmtFreq = Request.Form["gradField"];
 
 
-            List<Apartment> list = _listOfAllApartments.ToList().FindAll(a => a.CityId == filter.GradId);
+            List<Apartment> list = _listOfAllApartments.ToList().FindAll(x => x.TotalRooms >= filter.RoomNumber && x.MaxAdults >= filter.Adults
+                                                        && x.MaxChildren >= filter.Children && x.CityId == filter.GradId);
 
-            return View("ShowAllApartments", new ApartmentVM { ListaApartmana = list });
+            return Json(new {listApartments = list});
+        }
+
+        [HttpPost]
+        public ActionResult SortApartments(RWA.Models.SortingApartment filter)
+        {
+            IList<DataLayer.Model.Apartment> _listOfAllApartments = RepoFactory.GetRepo().LoadApartments();
+            var cities = RepoFactory.GetRepo().LoadCities();
+            ViewBag.Cities = cities;
+
+
+            switch (filter.Type)
+            {
+                case "id":
+                    if (filter.AscDesc == 1)
+                    {
+                        _listOfAllApartments.ToList().Sort((x, y) => x.Id.CompareTo(y.Id));
+                    }
+                    else
+                    {
+                        _listOfAllApartments.ToList().Sort((x, y) => -x.Id.CompareTo(y.Id));
+                    }
+                    break;
+                case "price":
+                    if (filter.AscDesc == 1)
+                    {
+                        _listOfAllApartments.ToList().Sort((x, y) => x.Price.CompareTo(y.Price));
+                    }
+                    else
+                    {
+                        _listOfAllApartments.ToList().Sort((x, y) => -x.Price.CompareTo(y.Price));
+                    }
+                    break;
+            }
+
+            return Json(new { listApartments = _listOfAllApartments });
         }
     }
 }

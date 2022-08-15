@@ -31,7 +31,7 @@ namespace DataLayer.Dal
         IList<Tags> GetUnusedTags(int id);
         void SoftDelete(int id);
         void SetAsRepresentative(int apatmentId, int id);
-        void CreateApartment(Apartment apartment);
+        int CreateApartment(Apartment apartment);
         void UpdateApartment(Apartment apartment);
         void SaveApartmentReview(ApartmentReview review);
         void SaveReservationForUnregisteredUsers(ApartmentReservation reservation);

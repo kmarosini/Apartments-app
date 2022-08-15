@@ -7,7 +7,7 @@
     var cities = ViewBag.Cities;
 }
 
-@using (Html.BeginForm("FilterApartments", "Home", FormMethod.Post))
+@using (Html.BeginForm("FilterApartments", "Home", FormMethod.Post, new {@id = "forma"}))
 {
     @Html.AntiForgeryToken()
 
@@ -18,19 +18,28 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.GradId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                    <select id="gradField">
-                        @foreach (var item in cities)
+                <select id="gradField">
+                    @foreach (var item in cities)
+                    {
+                        if (item.Id == Model.Filter?.GradId)
+                        {
+                            <option selected value="@item.Id">@item</option>
+
+                        }
+                        else
                         {
                             <option value="@item.Id">@item</option>
                         }
-                    </select>
+
+                    }
+                </select>
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.RoomNumber, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Filter.RoomNumber, new { htmlAttributes = new { @class = "form-control", @Id = "roomNumberField" } })
+                @Html.EditorFor(model => model.Filter.RoomNumber, new { htmlAttributes = new { @class = "form-control", @Id = "roomNumberField", @Value = Model.Filter?.RoomNumber } })
                 @Html.ValidationMessageFor(model => model.Filter.RoomNumber, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -38,7 +47,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.Adults, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Filter.Adults, new { htmlAttributes = new { @class = "form-control", @Id = "adultsField" } })
+                @Html.EditorFor(model => model.Filter.Adults, new { htmlAttributes = new { @class = "form-control", @Id = "adultsField", @Value = Model.Filter?.Adults } })
                 @Html.ValidationMessageFor(model => model.Filter.Adults, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -46,7 +55,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.Children, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Filter.Children, new { htmlAttributes = new { @class = "form-control", @Id = "childrenField" } } )
+                @Html.EditorFor(model => model.Filter.Children, new { htmlAttributes = new { @class = "form-control", @Id = "childrenField", @Value = Model.Filter?.Children } } )
                 @Html.ValidationMessageFor(model => model.Filter.Children, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -59,16 +68,29 @@
     </div>
 }
 
-
+<div>
+    <form id="formSorting">
+        <select id="sortSelect">
+            <option value="id">ID</option>
+            <option value="price">PRICE</option>
+        </select>
+        <select id="sortType">
+            <option value="0">Default</option>
+            <option value="1">Asc</option>
+            <option value="2">Desc</option>
+        </select>
+        <input type="submit" value="Sort" />
+    </form>
+</div>
 
 <h2>Apartment Overview</h2>
-<div class="container">
+<div class="container" id="apartmentContainer">
     <div class="row">
         @foreach (var item in Model.ListaApartmana)
         {
 
             <div class="col-md-3">
-                <img src="data:image/png;base64" width="100" height="100" />
+                <img src=@("data:Image/png;base64," + Convert.ToBase64String(item?.Base64Content)) width="100" height="100" />
                 <h1>@item.Name</h1>
 
                 <ul>
@@ -97,18 +119,104 @@
         const roomNumberField = document.querySelector("#roomNumberField");
         const adultsField = document.querySelector("#adultsField");
         const childrenField = document.querySelector("#childrenField");
+        const forma = document.querySelector("#forma");
+        const showApart = $("#apartmentContainer");
+        const sortingForm = document.querySelector("#formSorting");
+        const sortSelect = $("#sortSelect");
+        const sortType = $("#sortType");
+
+        sortingForm.onsubmit = function (e) {
+            e.preventDefault();
+            console.log(($("#sortType").find(":selected").text()))
+            $.ajax({
+                type: "POST",
+                url: "/Home/SortApartments",
+                data: {
+                    Type: $("#sortSelect").find(":selected").val(),
+                    AscDesc: parseInt($("#sortType").find(":selected").val())
+                },
+                success: function (data) {
+
+                    
+
+                    console.log(data);
+                    showApart.empty();
+
+                    var template = '';
+
+                    if (data.listApartments.length == 0) {
+                        return;
+                    }
+
+                    $.each(data.listApartments, function (key, value) {
+                        template += '<div class="row">'
+                        template += '<div class="col-md-3">';
+                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="100" height="100" />`;
+                        template += `<h1>${value.Name}</h1>`
+                        template += '<ul>'
+                        template += `<li>${value.BeachDistance} m</li>
+                                    <li>${value.TotalRooms} rooms</li>
+                                    <li>${value.MaxAdults} adults</li>
+                                    <li>${value.MaxChildren} children</li>`
+                        template += '</ul>'
+                        template += `<h3>${value.Price} €</h3>`
+                        template += `<a href="/Home/ApartmentDetails/${value.Id}">Reservation</a>`
+                        template += '</div>'
+                        template += '</div>'
+                    })
+
+                    showApart.append(template);
+                }
+                ,
+                error: function (err) {
+                    alert("Error")
+                }
+            })
+        }
+
 
         forma.onsubmit = function (e) {
             e.preventDefault();
+            console.log($("#gradField").find(":selected").val());
             $.ajax({
                 type: "POST",
                 url: "/Home/FilterApartments",
                 data: {
-                    GradId: parseInt(gradField),
+                    GradId: parseInt($("#gradField").find(":selected").val()),
                     RoomNumber: roomNumberField.value,
                     Adults: adultsField.value,
                     Children: childrenField.value
                 },
+                success: function (data) {
+                    console.log(data);
+                    showApart.empty();
+
+                    var template = '';
+
+                    if (data.listApartments.length == 0) {
+                        return;
+                    }
+
+                    $.each(data.listApartments, function (key, value) {
+                        template += '<div class="row">'
+                        template += '<div class="col-md-3">';
+                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="100" height="100" />`;
+                        template += `<h1>${value.Name}</h1>`
+                        template += '<ul>'
+                        template += `<li>${value.BeachDistance} m</li>
+                                    <li>${value.TotalRooms} rooms</li>
+                                    <li>${value.MaxAdults} adults</li>
+                                    <li>${value.MaxChildren} children</li>`
+                        template += '</ul>'
+                        template += `<h3>${value.Price} €</h3>`
+                        template += `<a href="/Home/ApartmentDetails/${value.Id}">Reservation</a>`
+                        template += '</div>'
+                        template += '</div>'
+                    })
+
+                    showApart.append(template);
+                }
+                ,
                 error: function (err) {
                     alert("Error")
                 }

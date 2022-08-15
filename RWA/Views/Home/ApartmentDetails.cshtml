@@ -4,13 +4,14 @@
     ViewBag.Title = "ApartmentDetails";
     var apartment = ViewBag.Apartment;
     var tags = ViewBag.Tags;
+    var pictures = ViewBag.Pictures;
 }
 
 <div class="d-flex p-2">
     <div class="d-flex flex-row">
         <div class="p-2">
             <h1>@apartment.Name</h1>
-            <img resource="C:\Users\Korsnik\Pictures\4k-james-harden-2019-basketball-stars-nba-besthqwallpapers.com-1920x1080.jpg" width="100" height="100" />
+            <img src=@("data:Image/png;base64," + Convert.ToBase64String(apartment?.Base64Content)) width="100" height="100" />
             <ul>
                 <li>@apartment.BeachDistance m</li>
                 <li>@apartment.TotalRooms rooms</li>
@@ -37,7 +38,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Reservation.UserEmail, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Reservation.UserEmail, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.Reservation.UserEmail, new { htmlAttributes = new { @class = "form-control", @Value = ((DataLayer.Model.AspNetUsers)Session["user"])?.Email } })
                         @Html.ValidationMessageFor(model => model.Reservation.UserEmail, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -45,7 +46,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Reservation.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Reservation.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.Reservation.UserName, new { htmlAttributes = new { @class = "form-control", @Value = ((DataLayer.Model.AspNetUsers)Session["user"])?.UserName } })
                         @Html.ValidationMessageFor(model => model.Reservation.UserName, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -53,7 +54,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Reservation.UserPhone, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Reservation.UserPhone, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.Reservation.UserPhone, new { htmlAttributes = new { @class = "form-control", @Value = ((DataLayer.Model.AspNetUsers)Session["user"])?.PhoneNumber } })
                         @Html.ValidationMessageFor(model => model.Reservation.UserPhone, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -61,7 +62,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Reservation.UserAddress, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Reservation.UserAddress, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.Reservation.UserAddress, new { htmlAttributes = new { @class = "form-control", @Value = ((DataLayer.Model.AspNetUsers)Session["user"])?.Address } })
                         @Html.ValidationMessageFor(model => model.Reservation.UserAddress, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -85,6 +86,14 @@
         @Html.Partial("_ReviewFormSubmit", Model)
 
     </div>
+
+    <div>
+        @foreach (var item in pictures)
+        {
+            <img src=@("data:Image/png;base64," + Convert.ToBase64String(item?.Base64Content)) width="100" height="100"/>
+        }
+    </div>
+
 </div>
 
 

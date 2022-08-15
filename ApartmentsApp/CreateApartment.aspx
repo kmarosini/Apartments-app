@@ -56,6 +56,14 @@
          <asp:TextBox ID="txtBeachDistance" runat="server"></asp:TextBox>
       </p>
 
+    <p>
+        Select image: <asp:FileUpload ID="FileImage" runat="server" />
+        <asp:Label ID="lblImage" runat="server" Text=""></asp:Label>
+        <asp:Image ID="Image" runat="server" />
+
+    </p>
+        
+
     <asp:Button ID="btnAdd" runat="server" Text="Add Apartment" OnClick="btnAdd_Click" />
 
 </asp:Content>
