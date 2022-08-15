@@ -18,7 +18,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Filter.GradId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select id="gradField">
+                <select id="gradField" class="form-select" aria-label="Default select example">
                     @foreach (var item in cities)
                     {
                         if (item.Id == Model.Filter?.GradId)
@@ -62,7 +62,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" style="margin:10px 0 0 0" class="btn btn-primary" />
             </div>
         </div>
     </div>
@@ -70,27 +70,29 @@
 
 <div>
     <form id="formSorting">
-        <select id="sortSelect">
+        <select id="sortSelect" class="form-select" style="margin:10px 0 0 0" aria-label="Default select example">
             <option value="id">ID</option>
             <option value="price">PRICE</option>
         </select>
-        <select id="sortType">
+        <select id="sortType" class="form-select" style="margin:10px 0 0 0" aria-label="Default select example">
             <option value="0">Default</option>
             <option value="1">Asc</option>
             <option value="2">Desc</option>
         </select>
-        <input type="submit" value="Sort" />
+        <input type="submit" style="margin:10px 0 0 0" value="Sort" class="btn btn-primary" />
     </form>
 </div>
 
-<h2>Apartment Overview</h2>
-<div class="container" id="apartmentContainer">
+<div style="margin:30px 0 0 0;" class="container" id="apartmentContainer">
     <div class="row">
         @foreach (var item in Model.ListaApartmana)
         {
-
-            <div class="col-md-3">
-                <img src=@("data:Image/png;base64," + Convert.ToBase64String(item?.Base64Content)) width="100" height="100" />
+        
+        <div class="col-sm" style="text-align:center">
+            <div class="card">
+                <div>
+                    <img src=@("data:Image/png;base64," + Convert.ToBase64String(item?.Base64Content)) class="img-thumbnail" style="align-content:center" width="250" height="150" />
+                </div>
                 <h1>@item.Name</h1>
 
                 <ul>
@@ -102,9 +104,20 @@
 
                 <h3>@item.Price €</h3>
 
-                <a href=@($"/Home/ApartmentDetails/{item.Id}")>Reservation</a>
+                <div>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star"></span>
+                    <span class="fa fa-star"></span>
+                </div>
+                <span>
+                    <a href=@($"/Home/ApartmentDetails/{item.Id}") style="width:150px; align-content:center" class="btn btn-primary">Reservation</a>
+                </span>
+                
             </div>
-
+        </div>
+        
         }
     </div>
 </div>
@@ -149,18 +162,33 @@
                     }
 
                     $.each(data.listApartments, function (key, value) {
+                        template += '<div style="margin:30px 0 0 0;" class="container" id="apartmentContainer">'
                         template += '<div class="row">'
-                        template += '<div class="col-md-3">';
-                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="100" height="100" />`;
+                        template += '<div class="col-sm">';
+                        template += '<div class="card">';
+                        template += '<div>';
+                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="250" height="150" />`;
+                        template += '</div>';
                         template += `<h1>${value.Name}</h1>`
                         template += '<ul>'
                         template += `<li>${value.BeachDistance} m</li>
-                                    <li>${value.TotalRooms} rooms</li>
-                                    <li>${value.MaxAdults} adults</li>
-                                    <li>${value.MaxChildren} children</li>`
+                                     <li>${value.TotalRooms} rooms</li>
+                                     <li>${value.MaxAdults} adults</li>
+                                     <li>${value.MaxChildren} children</li>`
                         template += '</ul>'
                         template += `<h3>${value.Price} €</h3>`
-                        template += `<a href="/Home/ApartmentDetails/${value.Id}">Reservation</a>`
+                        template += '<div>'
+                        template += '<span class="fa fa-star checked"></span>'
+                        template += '<span class="fa fa-star checked"></span>'
+                        template += '<span class="fa fa-star checked"></span>'
+                        template += '<span class="fa fa-star"></span>'
+                        template += '<span class="fa fa-star"></span>'
+                        template += '</div>'
+                        template += '<span>'
+                        template += `<a href="/Home/ApartmentDetails/${value.Id}" style="width:150px; align-content:center" class="btn btn-primary">Reservation</a>`
+                        template += '</span>'
+                        template += '</div>'
+                        template += '</div>'
                         template += '</div>'
                         template += '</div>'
                     })
@@ -198,18 +226,33 @@
                     }
 
                     $.each(data.listApartments, function (key, value) {
+                        template += '<div style="margin:30px 0 0 0;" class="container" id="apartmentContainer">'
                         template += '<div class="row">'
-                        template += '<div class="col-md-3">';
-                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="100" height="100" />`;
+                        template += '<div class="col-sm">';
+                        template += '<div class="card">';
+                        template += '<div>';
+                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="250" height="150" />`;
+                        template += '</div>';
                         template += `<h1>${value.Name}</h1>`
                         template += '<ul>'
                         template += `<li>${value.BeachDistance} m</li>
-                                    <li>${value.TotalRooms} rooms</li>
-                                    <li>${value.MaxAdults} adults</li>
-                                    <li>${value.MaxChildren} children</li>`
+                                     <li>${value.TotalRooms} rooms</li>
+                                     <li>${value.MaxAdults} adults</li>
+                                     <li>${value.MaxChildren} children</li>`
                         template += '</ul>'
                         template += `<h3>${value.Price} €</h3>`
-                        template += `<a href="/Home/ApartmentDetails/${value.Id}">Reservation</a>`
+                        template += '<div>'
+                        template += '<span class="fa fa-star checked"></span>'
+                        template += '<span class="fa fa-star checked"></span>'
+                        template += '<span class="fa fa-star checked"></span>'
+                        template += '<span class="fa fa-star"></span>'
+                        template += '<span class="fa fa-star"></span>'
+                        template += '</div>'
+                        template += '<span>'
+                        template += `<a href="/Home/ApartmentDetails/${value.Id}" style="width:150px; align-content:center" class="btn btn-primary">Reservation</a>`
+                        template += '</span>'
+                        template += '</div>'
+                        template += '</div>'
                         template += '</div>'
                         template += '</div>'
                     })
