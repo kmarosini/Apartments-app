@@ -13,8 +13,8 @@ namespace DataLayer.Dal
 {
     public class DBRepo : IRepo
     {
-        private static string CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
-        private static string APARTMENTS_CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string APARTMENTS_CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
 
         private SqlConnection connection;
         private SqlCommand command;
@@ -106,12 +106,12 @@ namespace DataLayer.Dal
                        BeachDistance = (int)row[nameof(Apartment.BeachDistance)],
                        Price = Math.Round((decimal)row[nameof(Apartment.Price)]),
                        CityId = (int)row[nameof(Apartment.CityId)],
-                       StatusId = (int)row[nameof (Apartment.StatusId)], 
+                       StatusId = (int)row[nameof(Apartment.StatusId)],
                        StatusName = (string)row[nameof(Apartment.StatusName)],
-                       Base64Content = (byte[])row[nameof(Apartment.Base64Content)],
+                       Base64Content = (byte[])(row[nameof(Apartment.Base64Content)] == System.DBNull.Value ? null : row[nameof(Apartment.Base64Content)]),
                        Ukupno = (int)row[nameof(Apartment.Ukupno)]
                    }
-               );
+               ) ;
             }
 
             return apartments;
@@ -213,7 +213,7 @@ namespace DataLayer.Dal
                         Name = (string)row[nameof(ApartmentPicture.Name)],
                         ApartmentId = (int)row[nameof(ApartmentPicture.ApartmentId)],
                         Id = (int)row[nameof(ApartmentPicture.Id)],
-                        Base64Content = (byte[])row[nameof(ApartmentPicture.Base64Content)]
+                        Base64Content = row[nameof(ApartmentPicture.Base64Content)] == System.DBNull.Value ? null : (byte[])row[nameof(ApartmentPicture.Base64Content)]
                     }
                 );
 
@@ -264,7 +264,7 @@ namespace DataLayer.Dal
                     CityId = (int)row[nameof(Apartment.CityId)],
                     StatusId = (int)row[nameof(Apartment.StatusId)],
                     StatusName = (string)row[nameof(Apartment.StatusName)],
-                    Base64Content = (byte[])row[nameof(Apartment.Base64Content)],
+                    Base64Content = row[nameof(Apartment.Base64Content)] == System.DBNull.Value ? null : (byte[])row[nameof(Apartment.Base64Content)],
                     Ukupno = (int)row[nameof(Apartment.Ukupno)]
                 };
             }

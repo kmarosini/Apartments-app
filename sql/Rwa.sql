@@ -87,11 +87,6 @@ group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartmen
 end
 
 create proc getAllApartmentOwner
-
-
-
-
-
 begin
 select * from ApartmentOwner
 end
