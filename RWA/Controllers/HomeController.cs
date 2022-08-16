@@ -121,7 +121,7 @@ namespace ApartmentsMVCApp.Controllers
             RepoFactory.GetRepo().SaveApartmentReview(new DataLayer.Model.ApartmentReview
             {
 
-                ApartmentId = int.Parse(id.ToString()),
+                ApartmentId = id,
                 Details = details,
                 UserId = ((AspNetUsers)Session["user"]).Id,
                 Stars = stars

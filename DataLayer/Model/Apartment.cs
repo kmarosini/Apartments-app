@@ -29,7 +29,8 @@ namespace DataLayer.Model
         public string StatusName { get; set; }
         public int Ukupno { get; set; }
         public byte[] Base64Content { get; set; }
-
+        public int ApartmentRating { get; set; }
+        public string ImageString { get; set; }
 
     }
 }

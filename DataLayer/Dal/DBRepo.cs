@@ -13,8 +13,8 @@ namespace DataLayer.Dal
 {
     public class DBRepo : IRepo
     {
-        private static string CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
-        private static string APARTMENTS_CS = @"Data Source=KONICHWA\MSSQLSERVER1;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
+        private static string APARTMENTS_CS = @"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True";
 
         private SqlConnection connection;
         private SqlCommand command;
@@ -109,7 +109,8 @@ namespace DataLayer.Dal
                        StatusId = (int)row[nameof(Apartment.StatusId)],
                        StatusName = (string)row[nameof(Apartment.StatusName)],
                        Base64Content = (byte[])(row[nameof(Apartment.Base64Content)] == System.DBNull.Value ? null : row[nameof(Apartment.Base64Content)]),
-                       Ukupno = (int)row[nameof(Apartment.Ukupno)]
+                       Ukupno = (int)row[nameof(Apartment.Ukupno)],
+                       ApartmentRating = (int)(row[nameof(Apartment.ApartmentRating)] == DBNull.Value ? 0 : row[nameof(Apartment.ApartmentRating)])
                    }
                ) ;
             }

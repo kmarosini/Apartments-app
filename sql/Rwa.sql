@@ -77,13 +77,14 @@ end
 alter proc getApartments
 as
 begin
-select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content
+select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentReview.Stars as ApartmentRating
 from Apartment
 LEFT JOIN City on City.Id = Apartment.CityId
 left join ApartmentStatus on ApartmentStatus.Id = Apartment.StatusId
 inner join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
+left join ApartmentReview on ApartmentReview.ApartmentId = Apartment.Id
 where Apartment.DeletedAt is NULL AND ApartmentPicture.IsRepresentative = 1
-group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative
+group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative, ApartmentReview.Stars 
 end
 
 create proc getAllApartmentOwner
