@@ -7,6 +7,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
+using Recaptcha.Web;
+using Recaptcha.Web.Mvc;
 
 namespace ApartmentsMVCApp.Controllers
 {
@@ -72,11 +74,34 @@ namespace ApartmentsMVCApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                
                 GetApartmentDetails();
+                var pictures = RepoFactory.GetRepo().GetApartmentPictures((int)Session["currentApartment"]);
+                ViewBag.Pictures = pictures;
+
 
                 return View("ApartmentDetails", new ReviewReservationViewModel { Reservation = reservation });
             }
 
+            RecaptchaVerificationHelper recaptchaHelper = this.GetRecaptchaVerificationHelper();
+            if (String.IsNullOrEmpty(recaptchaHelper.Response))
+            {
+                ModelState.AddModelError("", "Captcha answer cannot be empty.");
+                GetApartmentDetails();
+                var pictures = RepoFactory.GetRepo().GetApartmentPictures((int)Session["currentApartment"]);
+                ViewBag.Pictures = pictures;
+
+                return View("ApartmentDetails", new ReviewReservationViewModel { Reservation = reservation });
+            }
+            RecaptchaVerificationResult recaptchaResult = recaptchaHelper.VerifyRecaptchaResponse();
+            if (!recaptchaResult.Success)
+            {
+                GetApartmentDetails();
+                var pictures = RepoFactory.GetRepo().GetApartmentPictures((int)Session["currentApartment"]);
+                ViewBag.Pictures = pictures;
+
+                return View("ApartmentDetails", new ReviewReservationViewModel { Reservation = reservation });
+            }
 
             RepoFactory.GetRepo().SaveReservationForUnregisteredUsers(new DataLayer.Model.ApartmentReservation
             {
@@ -89,7 +114,7 @@ namespace ApartmentsMVCApp.Controllers
             });
             var cities = RepoFactory.GetRepo().LoadCities();
             ViewBag.Cities = cities;
-            return View("ShowAllApartments", new ApartmentVM { Filter = null, ListaApartmana = (List<Apartment>)RepoFactory.GetRepo().LoadApartments()});
+            return View("ShowAllApartments", new ApartmentVM { Filter = null, ListaApartmana = (List<Apartment>)RepoFactory.GetRepo().LoadApartments() });
         }
 
         private void GetApartmentDetails()
@@ -186,6 +211,13 @@ namespace ApartmentsMVCApp.Controllers
             }
 
             return Json(new { listApartments = _listOfAllApartments });
+        }
+
+        public ActionResult Odjava()
+        {
+            Session["user"] = null;
+
+            return RedirectToAction("ShowAllApartments", "Home");
         }
     }
 }

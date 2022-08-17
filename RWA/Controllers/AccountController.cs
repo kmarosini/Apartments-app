@@ -91,11 +91,5 @@ namespace RWA.Controllers
             return View("Login");
         }
 
-        public ActionResult Odjava()
-        {
-            Session["user"] = null;
-
-            return RedirectToAction("ShowAllApartments", "Home");
-        }
     }
 }

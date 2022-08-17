@@ -110,7 +110,8 @@ namespace DataLayer.Dal
                        StatusName = (string)row[nameof(Apartment.StatusName)],
                        Base64Content = (byte[])(row[nameof(Apartment.Base64Content)] == System.DBNull.Value ? null : row[nameof(Apartment.Base64Content)]),
                        Ukupno = (int)row[nameof(Apartment.Ukupno)],
-                       ApartmentRating = (int)(row[nameof(Apartment.ApartmentRating)] == DBNull.Value ? 0 : row[nameof(Apartment.ApartmentRating)])
+                       ApartmentRating = (int)(row[nameof(Apartment.ApartmentRating)] == DBNull.Value ? 0 : row[nameof(Apartment.ApartmentRating)]),
+                       ImageString = (row[nameof(Apartment.Base64Content)] == DBNull.Value ? null : Convert.ToBase64String((byte[])row[nameof(Apartment.Base64Content)]))
                    }
                ) ;
             }

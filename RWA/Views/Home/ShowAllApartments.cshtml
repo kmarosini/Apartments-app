@@ -91,9 +91,9 @@
         <div class="col-sm" style="text-align:center">
             <div class="card">
                 <div>
-                    @if (item.Base64Content != null)
+                    @if (item.ImageString != null)
                     {
-                        <img src=@("data:Image/png;base64," + Convert.ToBase64String(item?.Base64Content)) class="img-thumbnail" style="align-content:center" width="250" height="150" />
+                        <img src=@("data:Image/png;base64," + (item?.ImageString)) class="img-thumbnail" style="align-content:center" width="250" height="150" />
 
                     }
                 </div>
@@ -162,6 +162,24 @@
 
 
 
+                    switch ($("#sortSelect").find(":selected").val()) {
+                        case "id":
+                            if (parseInt($("#sortType").find(":selected").val()) == 1) {
+                                data.listApartments.sort((x, y) => x.Id - y.Id)
+                            }
+                            else {
+                                data.listApartments.sort((x, y) => y.Id - x.Id)
+                            }
+                            break;
+                        case "price":
+                            if (parseInt($("#sortType").find(":selected").val()) == 1) {
+                                data.listApartments.sort((x, y) => x.Price - y.Price)
+                            }
+                            else {
+                                data.listApartments.sort((x, y) => y.Price - x.Price)
+                            }
+                            break;
+                    }
                     console.log(data);
                     showApart.empty();
 
@@ -177,7 +195,7 @@
                         template += '<div class="col-sm">';
                         template += '<div class="card">';
                         template += '<div>';
-                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="250" height="150" />`;
+                        template += `<img src="data:image/png;base64, ${(value.ImageString)}" width="250" height="150" />`;
                         template += '</div>';
                         template += `<h1>${value.Name}</h1>`
                         template += '<ul>'
@@ -250,7 +268,7 @@
                         template += '<div class="col-sm">';
                         template += '<div class="card">';
                         template += '<div>';
-                        template += `<img src="data:image/png;base64, ${String.fromCharCode(value.Base64Content)}" width="250" height="150" />`;
+                        template += `<img src="data:image/png;base64, ${(value.ImageString)}" width="250" height="150" />`;
                         template += '</div>';
                         template += `<h1>${value.Name}</h1>`
                         template += '<ul>'
