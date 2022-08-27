@@ -1,7 +1,3 @@
-use RwaApartmani
-
-
-
 CREATE PROC get_tags
 AS
 BEGIN

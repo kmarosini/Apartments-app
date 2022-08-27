@@ -19,40 +19,13 @@ namespace ApartmentsApp
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            try
+            if (txtPassword.Text == "123" && txtUsername.Text == "admin")
             {
-                SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True");
-                conn.Open();
-
-                string checkUser = "select * from LoginDB where username='" + txtUsername.Text + "'";
-                SqlCommand cmd = new SqlCommand(checkUser, conn);
-                int temp = Convert.ToInt32(cmd.ExecuteScalar().ToString());
-                conn.Close();
-                if (temp == 1)
-                {
-                    conn.Open();
-                    string checkPassword = "select pass from LoginDB where  username='" + txtUsername.Text + "'";
-                    SqlCommand passCmd = new SqlCommand(checkPassword, conn);
-                    string password = passCmd.ExecuteScalar().ToString();
-                    if (password == txtPassword.Text)
-                    {
-                        Session["New"] = txtUsername.Text;
-                        Response.Redirect("Default.aspx");
-                    }
-                    else
-                    {
-
-                        lblErrorMessage.Visible = true;
-                    }
-                }
-                else
-                {
-                    lblErrorMessage.Visible = true;
-                }
+                Session["New"] = txtUsername.Text;
+                Response.Redirect("Default.aspx");
             }
-            catch (Exception)
+            else
             {
-
                 lblErrorMessage.Visible = true;
             }
         }
