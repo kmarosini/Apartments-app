@@ -2,307 +2,300 @@ use RwaApartmani
 
 
 
-Create proc get_tags
-as
-begin
-select * from Tag
-end
+CREATE PROC get_tags
+AS
+BEGIN
+	SELECT * FROM Tag
+END
 
-Create proc get_cities
-as
-begin
-select * from City
-end
+CREATE PROC get_cities
+AS
+BEGIN
+	SELECT * FROM City
+END
 
-create proc getTagUsage
-as 
-begin
-select COUNT(TaggedApartment.ApartmentId) as ukupno, Tag.Name, Tag.Id
-from Tag
-LEFT JOIN TaggedApartment on TaggedApartment.TagId = Tag.Id
-group by Tag.Name, Tag.Id
-end
-go
+CREATE PROC getTagUsage
+AS 
+BEGIN
+	SELECT COUNT(TaggedApartment.ApartmentId) AS ukupno, Tag.Name, Tag.Id
+	FROM Tag
+		LEFT JOIN TaggedApartment on TaggedApartment.TagId = Tag.Id
+	GROUP BY Tag.Name, Tag.Id
+END
+GO
 
-create proc CreateTag
-	@Guid uniqueidentifier,
-	@CreatedAt datetime2(7),
-	@TypeId int,
-	@Name nvarchar(50),
-	@NameEng nvarchar(50)
-as
-begin
-	insert into Tag
+CREATE PROC CreateTag
+	@Guid UNIQUEIDENTIFIER,
+	@CreatedAt DATETIME2(7),
+	@TypeId INT,
+	@Name NVARCHAR(50),
+	@NameEng NVARCHAR(50)
+AS
+BEGIN
+	INSERT INTO Tag
 				(Guid, CreatedAt, TypeId, Name, NameEng)
-	values (@Guid, @CreatedAt, @TypeId, @Name, @NameEng)
-end
+	VALUES (@Guid, @CreatedAt, @TypeId, @Name, @NameEng)
+END
 
-create table LoginDB
+CREATE TABLE LoginDB
 (
-	UserID int primary key, 
-	username nvarchar(50),
-	pass nvarchar(250)
+	UserID INT PRIMARY KEY, 
+	username NVARCHAR(50),
+	pass NVARCHAR(250)
 )
 
-create proc deleteTag
-	@Id int
-as
-begin
-delete from Tag
-where Tag.Id=@Id
-end
+CREATE PROC deleteTag
+	@Id INT
+AS
+BEGIN
+	DELETE FROM Tag
+	WHERE Tag.Id=@Id
+END
 
-alter proc CreateApartment
-	@OwnerId int,
-	@TypeId int,
-	@StatusId int,
-	@CityId int,
-	@Adress nvarchar(250),
-	@Name nvarchar(250),
-	@NameEng nvarchar(250),
-	@Price money,
-	@MaxAdults int,
-	@MaxChildren int,
-	@TotalRooms int,
-	@BeachDistance int,
-	@CreatedApartment int output
-as
-begin
-	insert into Apartment
+CREATE PROC CreateApartment
+	@OwnerId INT,
+	@TypeId INT,
+	@StatusId INT,
+	@CityId INT,
+	@Adress NVARCHAR(250),
+	@Name NVARCHAR(250),
+	@NameEng NVARCHAR(250),
+	@Price MONEY,
+	@MaxAdults INT,
+	@MaxChildren INT,
+	@TotalRooms INT,
+	@BeachDistance INT,
+	@CreatedApartment INT OUTPUT
+AS
+BEGIN
+	INSERT INTO Apartment
 				(Guid, CreatedAt, DeletedAt, OwnerId, TypeId, StatusId, CityId,Address,Name,NameEng,Price,MaxAdults,MaxChildren,TotalRooms,BeachDistance)
-	values (NEWID(), GETDATE(), NULL, @OwnerId, @TypeId, @StatusId, @CityId, @Adress, @Name, @NameEng, @Price, @MaxAdults, @MaxChildren, @TotalRooms, @BeachDistance)
+	VALUES (NEWID(), GETDATE(), NULL, @OwnerId, @TypeId, @StatusId, @CityId, @Adress, @Name, @NameEng, @Price, @MaxAdults, @MaxChildren, @TotalRooms, @BeachDistance)
 	SET @CreatedApartment = SCOPE_IDENTITY()
+END
+
+CREATE PROC getApartments
+AS
+BEGIN
+	SELECT COUNT(ApartmentPicture.ApartmentId) AS Ukupno, ApartmentStatus.Name AS StatusName, Apartment.Id, Apartment.Name AS ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentReview.Stars as ApartmentRating
+	FROM Apartment
+		LEFT JOIN City ON City.Id = Apartment.CityId
+		left join ApartmentStatus ON ApartmentStatus.Id = Apartment.StatusId
+		inner join ApartmentPicture ON ApartmentPicture.ApartmentId = Apartment.Id
+		left join ApartmentReview ON ApartmentReview.ApartmentId = Apartment.Id
+	WHERE Apartment.DeletedAt IS NULL AND ApartmentPicture.IsRepresentative = 1
+	GROUP BY Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative, ApartmentReview.Stars 
+END
+
+CREATE PROC getAllApartmentOwner
+BEGIN
+	SELECT * FROM ApartmentOwner
 end
 
-alter proc getApartments
-as
-begin
-select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentReview.Stars as ApartmentRating
-from Apartment
-LEFT JOIN City on City.Id = Apartment.CityId
-left join ApartmentStatus on ApartmentStatus.Id = Apartment.StatusId
-inner join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
-left join ApartmentReview on ApartmentReview.ApartmentId = Apartment.Id
-where Apartment.DeletedAt is NULL AND ApartmentPicture.IsRepresentative = 1
-group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative, ApartmentReview.Stars 
+CREATE PROC getApartmentStatus
+AS
+BEGIN
+	SELECT * FROM ApartmentStatus
+END
+
+CREATE PROC updateApartment
+	@Id INT,
+	@StatusId INT,
+	@MaxAdults INT,
+	@MaxChildren INT,
+	@TotalRooms INT,
+	@BeachDistance INT
+AS 
+BEGIN
+	UPDATE Apartment
+	SET
+		StatusId=@StatusId,
+		MaxAdults=@MaxAdults,
+		MaxChildren=@MaxChildren,
+		TotalRooms=@TotalRooms,
+		BeachDistance=@BeachDistance
+	WHERE Id=@Id
+END
+
+CREATE PROC getPictures
+AS
+BEGIN
+	SELECT COUNT(ApartmentPicture.ApartmentId) AS Ukupno, Apartment.Name, Apartment.Id
+	FROM Apartment
+		LEFT JOIN ApartmentPicture ON ApartmentPicture.ApartmentId = Apartment.Id
+	GROUP BY Apartment.Name, Apartment.Id
+END
+
+CREATE PROC getAspUsers
+AS
+BEGIN
+	SELECT AspNetUsers.Id, AspNetUsers.Email, AspNetUsers.PhoneNumber, AspNetUsers.UserName, AspNetUsers.Address
+	FROM AspNetUsers
+END
+
+CREATE PROC GetApartmentUsers
+AS 
+BEGIN
+	SELECT ApartmentReservation.Id, ApartmentReservation.ApartmentId, ApartmentReservation.UserId, Apartment.Name, AspNetUsers.UserName
+	FROM ApartmentReservation
+		LEFT JOIN Apartment ON Apartment.Id = ApartmentReservation.Id
+		LEFT JOIN AspNetUsers ON AspNetUsers.Id = ApartmentReservation.Id
+	GROUP BY Apartment.Name, ApartmentReservation.Id, ApartmentReservation.ApartmentId, ApartmentReservation.UserId, AspNetUsers.UserName
+END
+
+CREATE PROC getApartmentById
+	@Id INT
+AS 
+BEGIN
+	SELECT COUNT(ApartmentPicture.ApartmentId) AS Ukupno, ApartmentStatus.Name AS StatusName, Apartment.Id, Apartment.Name AS ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content
+	FROM Apartment
+		LEFT JOIN City ON City.Id = Apartment.CityId
+		LEFT JOIN ApartmentStatus ON ApartmentStatus.Id = Apartment.StatusId
+		LEFT JOIN ApartmentPicture ON ApartmentPicture.ApartmentId = Apartment.Id
+	WHERE Apartment.DeletedAt IS NULL AND ApartmentPicture.IsRepresentative = 1 AND Apartment.Id = @Id
+	GROUP BY Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative
+END
+
+CREATE PROC SoftDelete
+	@Id INT
+AS
+BEGIN
+	UPDATE Apartment 
+		SET DeletedAt = GETDATE()
+	WHERE Id = @Id
+END
+
+CREATE PROC GetUsedTags
+	@Id INT
+AS
+BEGIN
+	SELECT Tag.Name
+	FROM TaggedApartment
+		left join Tag ON Tag.Id = TaggedApartment.TagId
+	WHERE ApartmentId = @Id
+END
+
+
+CREATE PROC GetUnusedTags
+	@Id INT
+AS
+BEGIN
+	SELECT DISTINCT Tag.Name
+	FROM TaggedApartment
+	RIGHT JOIN Tag ON Tag.Id = TaggedApartment.TagId
+	WHERE Tag.Id NOT IN (
+	SELECT DISTINCT Tag.Id
+	FROM Tag
+	LEFT JOIN TaggedApartment ON TaggedApartment.TagId = Tag.Id
+	WHERE TaggedApartment.ApartmentId = @Id
+	)
 end
 
-create proc getAllApartmentOwner
-begin
-select * from ApartmentOwner
-end
+CREATE PROC InsertIntoTags
+	@Id INT,
+	@TagId INT
+AS 
+BEGIN
+	INSERT INTO TaggedApartment (Guid,ApartmentId,TagId)
+	VALUES (NEWID(), @Id, @TagId)
+END
 
-create proc getApartmentStatus
-as
-begin
-select * from ApartmentStatus
-end
-
-create proc updateApartment
-	@Id int,
-	@StatusId int,
-	@MaxAdults int,
-	@MaxChildren int,
-	@TotalRooms int,
-	@BeachDistance int
-as 
-begin
-update Apartment
-set
-StatusId=@StatusId,
-MaxAdults=@MaxAdults,
-MaxChildren=@MaxChildren,
-TotalRooms=@TotalRooms,
-BeachDistance=@BeachDistance
-where Id=@Id
-end
-
-create proc getPictures
-as
-begin
-select COUNT(ApartmentPicture.ApartmentId) as Ukupno, Apartment.Name, Apartment.Id
-from Apartment
-left join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
-group by Apartment.Name, Apartment.Id
-end
-
-create proc getAspUsers
-as
-begin
-select AspNetUsers.Id, AspNetUsers.Email, AspNetUsers.PhoneNumber, AspNetUsers.UserName, AspNetUsers.Address
-from AspNetUsers
-end
-
-create proc GetApartmentUsers
-as 
-begin
-select ApartmentReservation.Id, ApartmentReservation.ApartmentId, ApartmentReservation.UserId, Apartment.Name, AspNetUsers.UserName
-from ApartmentReservation
-left join Apartment on Apartment.Id = ApartmentReservation.Id
-left join AspNetUsers on AspNetUsers.Id = ApartmentReservation.Id
-group by Apartment.Name, ApartmentReservation.Id, ApartmentReservation.ApartmentId, ApartmentReservation.UserId, AspNetUsers.UserName
-end
-
-alter proc getApartmentById
-	@Id int
-as 
-begin
-select COUNT(ApartmentPicture.ApartmentId) as Ukupno, ApartmentStatus.Name as StatusName, Apartment.Id, Apartment.Name as ApartmentName,City.Name, Apartment.MaxAdults, Apartment.MaxChildren,Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content
-from Apartment
-LEFT JOIN City on City.Id = Apartment.CityId
-left join ApartmentStatus on ApartmentStatus.Id = Apartment.StatusId
-left join ApartmentPicture on ApartmentPicture.ApartmentId = Apartment.Id
-where Apartment.DeletedAt is NULL AND ApartmentPicture.IsRepresentative = 1 AND Apartment.Id = @Id
-group by Apartment.Name, Apartment.Id, ApartmentStatus.Name, City.Name, Apartment.MaxAdults, Apartment.MaxChildren, Apartment.TotalRooms, Apartment.Price, Apartment.CityId, Apartment.StatusId, Apartment.BeachDistance, ApartmentPicture.Base64Content, ApartmentPicture.IsRepresentative
-end
-
-create proc SoftDelete
-	@Id int
-as
-begin
-update Apartment 
-set DeletedAt = GETDATE()
-where Id = @Id
-end
-
-exec SoftDelete 14
-exec getApartmentById 1
-
-create proc GetUsedTags
-	@Id int
-as
-begin
-select Tag.Name
-from TaggedApartment
-left join Tag on Tag.Id = TaggedApartment.TagId
-where ApartmentId = @Id
-end
-
-
-create proc GetUnusedTags
-	@Id int
-as
-begin
-SELECT DISTINCT Tag.Name
-FROM TaggedApartment
-RIGHT JOIN Tag ON Tag.Id = TaggedApartment.TagId
-WHERE Tag.Id NOT IN (
-    SELECT DISTINCT Tag.Id
-    FROM Tag
-    LEFT JOIN TaggedApartment ON TaggedApartment.TagId = Tag.Id
-    WHERE TaggedApartment.ApartmentId = @Id
-)
-end
-
-create proc InsertIntoTags
-	@Id int,
-	@TagId int
-as 
-begin
-	insert into TaggedApartment (Guid,ApartmentId,TagId)
-	values (NEWID(), @Id, @TagId)
-end
-
-create proc InsertIntoUsers
-	@Email nvarchar(256),
-	@PhoneNumber nvarchar,
-	@UserName nvarchar(256),
-	@Address nvarchar(1000)
-as 
-begin
-	insert into AspNetUsers
+CREATE PROC InsertIntoUsers
+	@Email NVARCHAR(256),
+	@PhoneNumber NVARCHAR,
+	@UserName NVARCHAR(256),
+	@Address NVARCHAR(1000)
+AS 
+BEGIN
+	INSERT INTO AspNetUsers
 			(Guid, CreatedAt, DeletedAt, Email, EmailConfirmed, PasswordHash, SecurityStamp, PhoneNumber, PhoneNumberConfirmed, LockoutEndDateUtc, LockoutEnabled, AccessFailedCount, UserName, Address)
-	values(NEWID(), GETDATE(), NULL, @Email, 1, NULL, NULL, @PhoneNumber, 1, NULL, 0, 0, @UserName, @Address)
-end
+	VALUES(NEWID(), GETDATE(), NULL, @Email, 1, NULL, NULL, @PhoneNumber, 1, NULL, 0, 0, @UserName, @Address)
+END
 
-create proc InsertNotRegisteredResevation
-	@ApartmentId int,
-	@Details nvarchar(1000),
-	@UserId nvarchar(256),
-	@UserName nvarchar(250),
-	@UserEmail nvarchar(250),
-	@UserPhone nchar(20),
-	@UserAdress nvarchar(1000)
-as 
-begin
-	insert into ApartmentReservation
+CREATE PROC InsertNotRegisteredResevation
+	@ApartmentId INT,
+	@Details NVARCHAR(1000),
+	@UserId NVARCHAR(256),
+	@UserName NVARCHAR(250),
+	@UserEmail NVARCHAR(250),
+	@UserPhone NVARCHAR(20), 
+	@UserAdress NVARCHAR(1000)
+AS 
+BEGIN
+	INSERT INTO ApartmentReservation
 			(Guid, CreatedAt, ApartmentId, Details, UserId, UserName, UserEmail, UserPhone, UserAddress) 
-	values(NEWID(), GETDATE(), @ApartmentId, @Details, @UserId, @UserName, @UserEmail, @UserPhone, @UserAdress)
-end
+	VALUES(NEWID(), GETDATE(), @ApartmentId, @Details, @UserId, @UserName, @UserEmail, @UserPhone, @UserAdress)
+END
 
-create proc SavePicture
-	@ApartmentId int,
-	@Name nvarchar(250),
-	@Base64Content varbinary(max) 
-as
-begin
-if exists (Select * from ApartmentPicture where ApartmentId=@ApartmentId and IsRepresentative = 1)
-insert into ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Base64Content, Name, IsRepresentative)
-values (NEWID(), GETDATE(), NULL, @ApartmentId, null, @Base64Content, @Name, 0);
+CREATE PROC SavePicture
+	@ApartmentId INT,
+	@Name NVARCHAR(250),
+	@Base64Content VARBINARY(MAX) 
+AS
+BEGIN
+	IF EXISTS (SELECT * FROM ApartmentPicture WHERE ApartmentId=@ApartmentId AND IsRepresentative = 1)
+	INSERT INTO ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Base64Content, Name, IsRepresentative)
+	VALUES (NEWID(), GETDATE(), NULL, @ApartmentId, NULL, @Base64Content, @Name, 0);
 
-else
-insert into ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Base64Content, Name, IsRepresentative)
-values (NEWID(), GETDATE(), NULL, @ApartmentId, null, @Base64Content, @Name, 1);
-end
+	ELSE
+	INSERT INTO ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Base64Content, Name, IsRepresentative)
+	VALUES (NEWID(), GETDATE(), NULL, @ApartmentId, NULL, @Base64Content, @Name, 1);
+END
 
-create proc GetApartmentPictures 
-  @ApartmentId int
-as 
-begin
-select ApartmentPicture.ApartmentId, ApartmentPicture.Name, ApartmentPicture.Path, ApartmentPicture.IsRepresentative, ApartmentPicture.Id, ApartmentPicture.Base64Content
-from ApartmentPicture
-where ApartmentId = @ApartmentId
-end
-
-
-alter proc SetAsRepresentative
-	@ApartmentId int,
-	@Id int --pictureId
-as
-begin
-update ApartmentPicture set IsRepresentative = 0
-where ApartmentId=@ApartmentId
-update ApartmentPicture set IsRepresentative = 1
-where ApartmentPicture.Id=@Id
-end
+CREATE PROC GetApartmentPictures 
+  @ApartmentId INT
+AS 
+BEGIN
+	SELECT ApartmentPicture.ApartmentId, ApartmentPicture.Name, ApartmentPicture.Path, ApartmentPicture.IsRepresentative, ApartmentPicture.Id, ApartmentPicture.Base64Content
+	FROM ApartmentPicture
+	WHERE ApartmentId = @ApartmentId
+END
 
 
-create proc SaveApartmentReview
-	@ApartmentId int,
-	@UserId int,
-	@Details nvarchar(1000),
-	@Stars int
-as
-begin
-	insert into ApartmentReview(Guid, CreatedAt, ApartmentId, UserId, Details, Stars)
-	values ( NEWID(), GETDATE(), @ApartmentId, @UserId, @Details, @Stars);
-end
+CREATE PROC SetAsRepresentative
+	@ApartmentId INT,
+	@Id INT --pictureId
+AS
+BEGIN
+	UPDATE ApartmentPicture SET IsRepresentative = 0
+	WHERE ApartmentId=@ApartmentId
+	UPDATE ApartmentPicture SET IsRepresentative = 1
+	WHERE ApartmentPicture.Id=@Id
+END
 
-insert into ApartmentReview(Guid, CreatedAt, ApartmentId, UserId, Details, Stars)
-values ( NEWID(), GETDATE(), 1, 1, 'test', 2);
+CREATE PROC SaveApartmentReview
+	@ApartmentId INT,
+	@UserId INT,
+	@Details NVARCHAR(1000),
+	@Stars INT
+AS
+BEGIN
+	INSERT INTO ApartmentReview(Guid, CreatedAt, ApartmentId, UserId, Details, Stars)
+	VALUES ( NEWID(), GETDATE(), @ApartmentId, @UserId, @Details, @Stars);
+END
 
-create proc SaveReservationForUnregisteredUsers
-	@ApartmentId int,
-	@Details nvarchar(1000),
-	@UserName nvarchar(250),
-	@UserEmail nvarchar(250),
-	@UserPhone nvarchar(250),
-	@UserAddress nvarchar(250)
-as
-begin
-insert into ApartmentReservation(Guid, CreatedAt, ApartmentId, Details, UserName, UserEmail, UserPhone, UserAddress)
-values ( NEWID(), GETDATE(), @ApartmentId, @Details, @UserName,@UserEmail, @UserPhone, @UserAddress);
-end
+CREATE PROC SaveReservationForUnregisteredUsers
+	@ApartmentId INT,
+	@Details NVARCHAR(1000),
+	@UserName NVARCHAR(250),
+	@UserEmail NVARCHAR(250),
+	@UserPhone NVARCHAR(250),
+	@UserAddress NVARCHAR(250)
+AS
+BEGIN
+	INSERT INTO ApartmentReservation(Guid, CreatedAt, ApartmentId, Details, UserName, UserEmail, UserPhone, UserAddress)
+	VALUES ( NEWID(), GETDATE(), @ApartmentId, @Details, @UserName,@UserEmail, @UserPhone, @UserAddress);
+END
 
-create proc SaveReservationForRegisteredUsers
-	@ApartmentId int,
-	@Details nvarchar(1000),
-	@UserId int
-as
-begin
-insert into ApartmentReservation(Guid, CreatedAt, ApartmentId, Details, UserId)
-values ( NEWID(), GETDATE(), @ApartmentId, @Details, @UserId)
-end
+CREATE PROC SaveReservationForRegisteredUsers
+	@ApartmentId INT,
+	@Details NVARCHAR(1000),
+	@UserId INT
+AS
+BEGIN
+	INSERT INTO ApartmentReservation(Guid, CreatedAt, ApartmentId, Details, UserId)
+	VALUES ( NEWID(), GETDATE(), @ApartmentId, @Details, @UserId)
+END
 
 CREATE PROC AuthUser
 	@Email NVARCHAR(50),
@@ -315,7 +308,7 @@ BEGIN
 END
 GO
 
-create PROC RegisterUser
+CREATE PROC RegisterUser
 	@Email NVARCHAR(50),
 	@PasswordHash nvarchar(MAX),
 	@PhoneNumber NVARCHAR(MAX),
@@ -328,37 +321,13 @@ BEGIN
 END
 GO
 
-insert into ApartmentPicture (Guid, CreatedAt, DeletedAt, ApartmentId, Path, Base64Content, Name, IsRepresentative)
-values (NEWID(), GETDATE(), NULL, 1, null, CONVERT(VARBINARY(MAX),'mmsm'), 'dcsdd', 1);
+ALTER TABLE ApartmentPicture
+DROP COLUMN Base64content
 
-exec GetApartmentPictures 3
-
-alter table ApartmentPicture
-drop column Base64content
-
-alter table ApartmentPicture
-add Base64Content VARBINARY(MAX)
+ALTER TABLE ApartmentPicture
+ADD Base64Content VARBINARY(MAX)
 
 
-insert into LoginDB(UserID ,username, pass)
-values (1,'admin', '123')
+INSERT INTO LoginDB(UserID ,username, pass)
+VALUES (1,'admin', '123')
 
-
-select * from Tag
-select * from LoginDB where username='admin'
-select * from TaggedApartment
-select * from ApartmentPicture
-select * from Apartment
-select * from LoginDB
-select * from City
-select * from ApartmentOwner
-select * from ApartmentStatus
-select * from AspNetUsers
-select * from AspNetRoles
-select * from AspNetUserLogins
-select * from ApartmentReview
-select * from ApartmentReservation
-select * from TagType
-select * from TaggedApartment
-
---apartmane i njihove base64, where representative, u selectu dodat novi column base64

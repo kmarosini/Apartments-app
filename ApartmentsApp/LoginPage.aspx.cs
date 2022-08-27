@@ -19,32 +19,40 @@ namespace ApartmentsApp
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True");
-            conn.Open();
-
-            string checkUser = "select * from LoginDB where username='" + txtUsername.Text + "'";
-            SqlCommand cmd = new SqlCommand(checkUser, conn);
-            int temp = Convert.ToInt32(cmd.ExecuteScalar().ToString());
-            conn.Close();
-            if (temp == 1)
+            try
             {
+                SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-958MSQ8\SQLEXPRESS2;Initial Catalog=RwaApartmani;Integrated Security=True");
                 conn.Open();
-                string checkPassword = "select pass from LoginDB where  username='" + txtUsername.Text + "'";
-                SqlCommand passCmd = new SqlCommand(checkPassword, conn);
-                string password = passCmd.ExecuteScalar().ToString();
-                if (password==txtPassword.Text)
+
+                string checkUser = "select * from LoginDB where username='" + txtUsername.Text + "'";
+                SqlCommand cmd = new SqlCommand(checkUser, conn);
+                int temp = Convert.ToInt32(cmd.ExecuteScalar().ToString());
+                conn.Close();
+                if (temp == 1)
                 {
-                    Session["New"] = txtUsername.Text;
-                    Response.Redirect("Default.aspx");
+                    conn.Open();
+                    string checkPassword = "select pass from LoginDB where  username='" + txtUsername.Text + "'";
+                    SqlCommand passCmd = new SqlCommand(checkPassword, conn);
+                    string password = passCmd.ExecuteScalar().ToString();
+                    if (password == txtPassword.Text)
+                    {
+                        Session["New"] = txtUsername.Text;
+                        Response.Redirect("Default.aspx");
+                    }
+                    else
+                    {
+
+                        lblErrorMessage.Visible = true;
+                    }
                 }
                 else
                 {
-
-                    lblErrorMessage.Visible=true;
+                    lblErrorMessage.Visible = true;
                 }
             }
-            else
+            catch (Exception)
             {
+
                 lblErrorMessage.Visible = true;
             }
         }
